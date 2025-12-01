@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version: "1.25.4"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
 
@@ -28,6 +28,12 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.4"
+
+      # Workaround for 'go: no such tool "covdata"'
+      - name: Configure Go toolchain
+        run: go env -w GOTOOLCHAIN=go1.25.1+auto
 
       - name: Install dependencies
         run: go mod download
@@ -40,3 +46,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: ColonyPM/cpm-cli
+          files: coverage.txt
