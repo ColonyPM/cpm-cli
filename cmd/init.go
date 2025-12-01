@@ -73,7 +73,7 @@ func initPackage() error {
 }
 
 var initCmd = &cobra.Command{
-	Use:   "init [DIR]",
+	Use:   "init",
 	Short: "Initialize a new package",
 	Long:  "Initialize a new cpm package in the current directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
