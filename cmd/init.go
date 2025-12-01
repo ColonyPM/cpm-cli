@@ -38,7 +38,7 @@ func getUsername() (string, error) {
 	return "", errors.New("failed to get username")
 }
 
-func initPackage() error {
+func initPackage(_ *cobra.Command, _ []string) error {
 	// Fail if package.yml already exists
 	if _, err := os.Stat(manifestName); err == nil {
 		return ErrManifestAlreadyExists
@@ -76,9 +76,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize a new package",
 	Long:  "Initialize a new cpm package in the current directory",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return initPackage()
-	},
+	RunE:  initPackage,
 }
 
 func init() {
