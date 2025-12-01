@@ -79,6 +79,7 @@ func extractArchive(rr io.Reader, destDir string) error {
 }
 
 func downloadPackage(cmd *cobra.Command, args []string) error {
+	fmt.Println(" Downloading " + args[0] + "...")
 	ctx := cmd.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -96,7 +97,7 @@ func downloadPackage(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("create destination path: %w", err)
 	}
 
-	rr, err := httpClient.Download(ctx, args[0])
+	rr, err := repoClient.Download(ctx, args[0])
 	if err != nil {
 		return err
 	}
@@ -106,7 +107,7 @@ func downloadPackage(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("Download OK")
+	fmt.Println(" Downloaded " + args[0] + " ✅")
 	return nil
 }
 
