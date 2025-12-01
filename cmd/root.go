@@ -9,12 +9,13 @@ import (
 
 const baseURL = "https://conjoined-aide-abeyantly.ngrok-free.dev/api"
 
-var httpClient = repository.New(baseURL)
+var repoClient = repository.New(baseURL)
 
 var rootCmd = &cobra.Command{
-	Use:   "cpm",
-	Short: "A brief description of your application",
-	Long:  "A longer description that spans multiple lines",
+	Use:          "cpm",
+	Short:        "A brief description of your application",
+	Long:         "A longer description that spans multiple lines",
+	SilenceUsage: true,
 }
 
 func Execute() {

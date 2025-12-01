@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/spf13/cobra"
 )
 
 func TestInitPackageCreatesManifest(t *testing.T) {
@@ -16,7 +18,7 @@ func TestInitPackageCreatesManifest(t *testing.T) {
 
 	t.Setenv("USER", "testuser")
 
-	if err := initPackage(); err != nil {
+	if err := initPackage(&cobra.Command{}, nil); err != nil {
 		t.Fatalf("initPackage() error = %v", err)
 	}
 
@@ -44,7 +46,7 @@ func TestInitManifestAlreadyExists(t *testing.T) {
 		t.Fatalf("failed to create manifest: %v", err)
 	}
 
-	err = initPackage()
+	err = initPackage(&cobra.Command{}, nil)
 	if err == nil {
 		t.Fatalf("initPackage() error = nil, want ErrManifestAlreadyExists")
 	}
