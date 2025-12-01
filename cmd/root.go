@@ -9,14 +9,10 @@ import (
 
 const baseURL = "https://conjoined-aide-abeyantly.ngrok-free.dev/api"
 
-// Shared client for all commands in this package.
 var httpClient = repository.New(baseURL)
 
-// var defaultDestPath = "~/.local/share/cpm/pkgs"
-var defaultDestPath = "./pkgs"
-
 var rootCmd = &cobra.Command{
-	Use:   "cpm-cli",
+	Use:   "cpm",
 	Short: "A brief description of your application",
 	Long:  "A longer description that spans multiple lines",
 }
