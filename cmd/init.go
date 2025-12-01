@@ -1,40 +1,86 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"os/user"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+const manifestName = "package.yml"
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+const manifestTemplate = `name: "%s"
+version: "0.0.0"
+description: ""
+author: "%s"
+`
+
+var ErrManifestAlreadyExists = errors.New("manifest already exists")
+
+func getUsername() (string, error) {
+	// Preferred: os/user
+	if u, err := user.Current(); err == nil && u.Username != "" {
+		return u.Username, nil
+	}
+
+	// Fallbacks via environment
+	if v := os.Getenv("USER"); v != "" {
+		return v, nil
+	}
+	if v := os.Getenv("USERNAME"); v != "" {
+		return v, nil
+	}
+
+	return "", errors.New("failed to get username")
+}
+
+func initPackage() error {
+	// Fail if package.yml already exists
+	if _, err := os.Stat(manifestName); err == nil {
+		return ErrManifestAlreadyExists
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("error checking %s: %v", manifestName, err)
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get cwd: %v", err)
+	}
+
+	// Use the cwd name as the package name
+	pkgName := filepath.Base(cwd)
+
+	username, err := getUsername()
+	if err != nil {
+		username = ""
+	}
+
+	escapedPkg := strings.ReplaceAll(pkgName, `"`, `\"`)
+	escapedUser := strings.ReplaceAll(username, `"`, `\"`)
+
+	content := fmt.Sprintf(manifestTemplate, escapedPkg, escapedUser)
+
+	// perms: rw-r--r--
+	if err := os.WriteFile(manifestName, []byte(content), 0o644); err != nil {
+		return fmt.Errorf("failed to write %s: %v", manifestName, err)
+	}
+
+	return nil
+}
+
+var initCmd = &cobra.Command{
+	Use:   "init [DIR]",
+	Short: "Initialize a new package",
+	Long:  "Initialize a new cpm package in the current directory",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return initPackage()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
